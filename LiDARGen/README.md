@@ -1,0 +1,1 @@
+This repo contains modifications to the the official implementation for LiDARGen [Learning to Generate Realistic LiDAR Point Clouds](https://arxiv.org/abs/2209.03954). These modifications enable simultaneous sampling of the pretrained network (downloadable from https://github.com/vzyrianov/lidargen) for more geometrically consistent results.

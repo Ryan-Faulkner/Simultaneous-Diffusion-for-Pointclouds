@@ -1,0 +1,98 @@
+training:
+  batch_size: 8 # training stage batch size
+  n_epochs: 500000
+  n_iters: 300001
+  snapshot_freq: 2000 # 5000
+  snapshot_sampling: false
+  anneal_power: 2
+  log_all_sigmas: false
+
+sampling:
+  batch_size: 42 # sampling batch size -- adjust based on your GPU memory
+  actualBatchSize: 7 #The actual batch size within which to share information
+  data_init: false # set it to be false during sampling, only use during debugging
+  step_lr: 0.0000062 # do not change
+  n_steps_each: 5 # do not change
+  ckpt_id: 897 # checkpoint id
+  final_only: true # store the full difussion process or the final sample only; works only under non fid mode
+  fid: false # batch sample large-scale data for FID evaluation
+  denoise: True # final denoising step
+  num_samples4fid: 1 # number of batch samples
+  inpainting: true # conduct inpainting task
+  interpolation: false # conduct view interpolation task
+  densification: false # conduct densification task
+  diverse: true # diverse -- only used for densification
+  n_interpolations: 15 # interpolation params.
+
+fast_fid:
+  batch_size: 1000
+  num_samples: 1000
+  step_lr: 0.0000062
+  n_steps_each: 5
+  begin_ckpt: 5000
+  end_ckpt: 300000
+  verbose: false
+  ensemble: false
+
+test:
+  begin_ckpt: 5000
+  end_ckpt: 300000
+  batch_size: 100
+
+data:
+  # dataset: "HDVMineGenerate"
+  # image_size: 160
+  # image_width: 360
+  image_size: 64
+  image_width: 1024
+  # image_size: 16
+  # image_width: 36
+  #If I need to reduce this, set colmax to 360 in lidar_utils and it will generate the full image then take only the section I can fit onto GPU e.g. 240
+  #But also this is less than 64*1024 so it should be fine
+  # dataset: "HDVMineGenerateFromInvidivualScans"
+#   dataset: "KITTI360_im_AllForOne"
+  dataset: "KITTI360_im_8batch"
+#   dataset: "KITTI360_im_simultaneous_densification"
+  # dataset: "HDVMinePreGenerated8Batch"
+  # image_size: 800
+  # image_width: 1800
+  channels: 2
+  logit_transform: false
+  uniform_dequantization: false
+  gaussian_dequantization: false
+  random_flip: false
+  random_roll: false
+  rescaled: false
+  num_workers: 4
+  #Normal mods
+  # modifications: [[0,0,0],[10,0,0],[0,10,0],[10,10,0],[0,0,10],[-10,0,0],[0,-10,0],[-10,-10,0]]
+  #No point having a 0,0,0 if I don't edit the base origin whatsoever
+  #I'm also going to ditch the Z axis mod for first test
+  # modifications: [[-10,10,0],[10,0,0],[0,10,0],[10,10,0],[10,-10,0],[-10,0,0],[0,-10,0],[-10,-10,0]]
+  #AllForOneModifications need to surround the target 0,0,0 origin. Best setup seems to be double-triangle method.
+  modifications: [[0,0,0],[5,-5,0],[-5,-5,0],[0,5,0],[-10,10,0],[10,10,0],[-10,0,0]]
+  #The original "square" based approach which did worse
+  # modifications: [[0,0,0],[5,5,0],[-5,5,0],[5,-5,0],[-5,-5,0],[-7.5,0,0],[7.5,0,0],[0,-7.5,0]]
+
+model:
+  sigma_begin: 50 # init noise, this is going to cause so much fuckery with the XYZ, e.g. change the Z and now the point doesn't exist whatsoever
+  # sigma_begin: 1 # init noise
+  num_classes: 232
+  # num_classes: 232
+  ema: true
+  ema_rate: 0.999
+  spec_norm: false
+  sigma_dist: geometric
+  sigma_end: 0.01 # final noise --> should be smaller for next version
+  normalization: InstanceNorm++
+  nonlinearity: elu
+  ngf: 128
+
+optim:
+  weight_decay: 0.0000 # revisit the weight decay as it might help with preventing nan issue
+  optimizer: "Adam"
+  lr: 0.0001
+  # lr: 0.00000001
+  beta1: 0.9
+  amsgrad: false
+  eps: 0.00000001
