@@ -10,11 +10,20 @@ Inpainting.yml is used for inpainting, creating synthetic views surrounding the 
 
 Densification.yml runs densification.
 
+There are runners for different variants:
+
+ncsn_runner_basic_simultaneous.py makes no effort to combine or enforce consistency between views, and is the basic method compared against in tables
+
+ncsn_runner_kitti_simultaneous.py enforces all kitti range images are generated with consistency between them, and is for when multiple synthetic viewpoints are desired
+
+ncsn_runner_AllForOne.py does the same thing but is for tasks which only want a single view, so all additional viewpoints exist purely to supplement results in the main one desired (hence the name)
+
 For example, to run experiments for generating novel views:
 
 ```
 python main.py --ni --sample --config Line.yml
 ```
+The configs
 
 All tests configuration produce results using both our simultaneous sampling, and single-view sampling.
 
